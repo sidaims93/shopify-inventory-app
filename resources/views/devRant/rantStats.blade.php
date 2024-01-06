@@ -1,0 +1,1 @@
+<p class="mb-0"><span class="badge bg-white text-dark"><b>{{$rant['score']}}</b>++</span> @if($rant['num_comments'] > 0) <span class="badge bg-dark text-white" style="float:right">Comments: {{$rant['num_comments']}}</span>@endif</p>

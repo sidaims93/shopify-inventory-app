@@ -1,0 +1,24 @@
+{
+    "development": {
+        "username": "root",
+        "password": "",
+        "database": "inventoryapp",
+        "host": "localhost",
+        "dialect": "mysql",
+        "logging": false
+    },
+    "test": {
+        "username": "",
+        "password": null,
+        "database": "",
+        "host": "",
+        "dialect": "mysql"
+    },
+    "production": {
+        "username": "",
+        "password": null,
+        "database": "",
+        "host": "localhost",
+        "dialect": "mysql"
+    }
+}

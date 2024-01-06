@@ -1,0 +1,11 @@
+version: '1'
+services:
+  expjs:
+    build: ./expressjs
+    image: dev/expjs:1
+    restart: always
+    container_name: expjs.dev
+    environment:
+      - NODE_ENV=dev
+    ports: 
+      - "9009:9009"
