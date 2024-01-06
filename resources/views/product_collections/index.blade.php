@@ -15,10 +15,8 @@
           </ol>
         </nav>
       </div>
-      <div class="col-4" style="display: none;">
-        {{-- @can('write-orders')
-          <a href="{{route('orders.sync')}}" style="float: right" class="btn btn-primary">Sync Product Collections</a>
-        @endcan --}}
+      <div class="col-4">        
+        <a href="{{route('shopify.product.collections.sync')}}" style="float: right" class="btn btn-primary">Sync Product Collections</a>
       </div>
     </div>
   </div><!-- End Page Title -->

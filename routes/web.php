@@ -18,16 +18,20 @@ Auth::routes();
 Route::middleware('auth')->group(function () {
     Route::prefix('orders')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('shopify.orders');
+        Route::get('sync', [OrderController::class, 'syncOrdersForStore'])->name('shopify.orders.sync');
     });
 
     Route::prefix('products')->group(function () {
         Route::get('/', [ProductController::class, 'index'])->name('shopify.products');
         Route::get('collections', [ProductController::class, 'productCollections'])->name('shopify.product.collections');
+        Route::get('collections/sync', [ProductController::class, 'syncProductCollections'])->name('shopify.product.collections.sync');
         Route::get('show', [ProductController::class, 'showProductData'])->name('shopify.product.show');
+        Route::get('sync', [ProductController::class, 'syncProductsForStore'])->name('shopify.products.sync');
     });
 
     Route::prefix('inventories')->group(function () {
         Route::get('/', [InventoryController::class, 'index'])->name('shopify.inventories');
+        Route::get('sync', [InventoryController::class, 'syncInventoriesForStore'])->name('shopify.inventories.sync');
     });
     
     Route::prefix('dashboard')->group(function () {
