@@ -5,6 +5,7 @@ const bodyParser = require('body-parser'); // middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 const Redis = require("ioredis");
 const { MongoClient } = require('mongodb');
+var cronHandler = require('node-cron');
 
 const redis = new Redis({
   port: 6379, // Redis port
@@ -78,6 +79,14 @@ app.get('/', (req, res) => {
     "message": "Hello World" 
   }).status(200);
 })
+
+const storeValidityHandler = require('./crons/checkStoreValidity.js');
+var storeValidityClass = new storeValidityHandler(mysqlAPI, redis, traits);
+  
+//Schedule and handle crons
+cronHandler.schedule('* */1 * * *', async () => { //Every hour
+  await storeValidityClass.work();
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
