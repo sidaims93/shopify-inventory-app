@@ -1,5 +1,5 @@
 module.exports = (mysqlAPI, traits) => {
-    const stripe = require('stripe')('sk_test_51MFiXgSJPy7VH3kiXHxRivBOxRz8Kb7fl6bdDoqaBeCdy6cSWppJwiy0bnaewvymNvvYV41poF5TSZtMlm5tavB4004Ld8edwp');
+    const stripe = require('stripe')('YOUR KEY HERE');
 
     async function getPlanDetailsOfCustomer(customer) {
         const subscriptions = await stripe.subscriptions.list({
