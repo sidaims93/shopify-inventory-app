@@ -26,7 +26,7 @@ if (!function_exists('getShopifyAPIURLForStore')) {
         if($env == 'local') {
             $prefix = 'http://localhost:3000/';
         } else {
-            $prefix = ''; //Whatever the NGROK url returns or deployment URL is
+            $prefix = 'http://localhost:3000/'; //Whatever the NGROK url returns or deployment URL is
         }
 
         return $prefix.'api/'.$path;

@@ -1,4 +1,4 @@
-module.exports = (mysqlAPI, traits, redis) => {
+module.exports = (mysqlAPI, traits) => {
     const functionTrait = traits.FunctionTrait;
     const requestTrait = traits.RequestTrait;
 

@@ -1,4 +1,4 @@
-module.exports = (mysqlAPI, traits, redis) => {
+module.exports = (mysqlAPI, traits) => {
   const functionTrait = traits.FunctionTrait;
   const requestTrait = traits.RequestTrait;
 
@@ -70,11 +70,11 @@ module.exports = (mysqlAPI, traits, redis) => {
         var stores = await mysqlAPI.getAllStores(['table_id', 'id', 'myshopify_domain', 'accessToken']);
         if(stores) {
           for await(var store of stores) {
-            const redisKey = `sync:products:store:${store.table_id}`;
-            const redisKeyExists = await redis.exists(redisKey);
-            if(redisKeyExists) {
+            //const redisKey = `sync:products:store:${store.table_id}`;
+            //const redisKeyExists = await redis.exists(redisKey);
+            //if(redisKeyExists) {
               //do nothing, I guess. Sync already ran
-            } else {
+            //} else {
               //await redis.set(redisKey, '1', 'EX', '300'); //5 minutes
               try {
                 var since_id = null;
@@ -101,7 +101,7 @@ module.exports = (mysqlAPI, traits, redis) => {
               } catch (error) {
                 console.log('in error block '+error.message);
               }
-            }
+            //}
           }
         }
 
@@ -130,11 +130,11 @@ module.exports = (mysqlAPI, traits, redis) => {
         var stores = await mysqlAPI.getAllStores(['table_id', 'id', 'myshopify_domain', 'accessToken']);
         if(stores) {
           for await(var store of stores) {
-            const redisKey = `sync:orders:store:${store.table_id}`;
-            const redisKeyExists = await redis.exists(redisKey);
-            if(redisKeyExists) {
+            //const redisKey = `sync:orders:store:${store.table_id}`;
+            //const redisKeyExists = await redis.exists(redisKey);
+            //if(redisKeyExists) {
               //do nothing, I guess. Sync already ran
-            } else {
+            //} else {
               //await redis.set(redisKey, '1', 'EX', '300'); //5 minutes
               try {
                 var since_id = null;
@@ -183,7 +183,7 @@ module.exports = (mysqlAPI, traits, redis) => {
               } catch (error) {
                 console.log('in error block '+error.message);
               }
-            }
+            //}
           }
         }
 
@@ -210,15 +210,15 @@ module.exports = (mysqlAPI, traits, redis) => {
         var stores = await mysqlAPI.getAllStores(['table_id', 'id', 'myshopify_domain', 'accessToken']);
         if(stores) {
           for await(var store of stores) {
-            const redisKey = `sync:collections:store:${store.table_id}`;
-            const redisKeyExists = await redis.exists(redisKey);
-            if(redisKeyExists) {
+            //const redisKey = `sync:collections:store:${store.table_id}`;
+            //const redisKeyExists = await redis.exists(redisKey);
+            //if(redisKeyExists) {
               //do nothing, I guess. Sync already ran
-            } else {
+            //} else {
               //await redis.set(redisKey, '1', 'EX', '300'); //5 minutes
               await saveCollectionsForStore(store, 'custom');
               await saveCollectionsForStore(store, 'smart');
-            }
+            //}
           }
         }
 
@@ -234,14 +234,14 @@ module.exports = (mysqlAPI, traits, redis) => {
         var stores = await mysqlAPI.getAllStores(['table_id', 'id', 'myshopify_domain', 'accessToken']);
         if(stores) {
           for await(var store of stores) {
-            const redisKey = `sync:locations:store:${store.table_id}`;
-            const redisKeyExists = await redis.exists(redisKey);
-            if(redisKeyExists) {
-              //do nothing, I guess. Sync already ran
-            } else {
-              //await redis.set(redisKey, '1', 'EX', '300'); //5 minutes
-              await saveLocationsForStore(store);
-            }
+            //const redisKey = `sync:locations:store:${store.table_id}`;
+            //const redisKeyExists = await redis.exists(redisKey);
+            // if(redisKeyExists) {
+            //   //do nothing, I guess. Sync already ran
+            // } else {
+            //await redis.set(redisKey, '1', 'EX', '300'); //5 minutes
+            await saveLocationsForStore(store);
+            //}
           }
         }
         returnVal = {"status": true, 'message': 'Done'};

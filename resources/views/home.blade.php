@@ -15,8 +15,8 @@
 
       <div class="mb-2">
         <span class="p-1 form-control badge bg-secondary">
-          <h6 style="float: left;margin-top:8px;margin-left:8px">Viewing data for: {{$dashboardData['activeStore']['name']}}</h6> 
-          @if(isset($dashboardData['storesAvailable']) && count($dashboardData['storesAvailable']) > 1) 
+          <h6 style="float: left;margin-top:8px;margin-left:8px">Viewing data for: {{$dashboardData['activeStore']['name'] ?? ''}}</h6> 
+          @if(isset($dashboardData['storesAvailable']) && is_array($dashboardData['storesAvailable']) && count($dashboardData['storesAvailable']) > 1) 
             <a style="float:right" class="btn btn-primary">Change Store</a>
           @endif
           <a style="float:right" class="btn btn-primary" href="{{route('check.store.setup')}}">Check Store Setup</a>
@@ -26,15 +26,15 @@
       <div class="col-lg-8">
         <div class="row">
 
-          @include('dashboard.salesCard', ['data' => $dashboardData['dashboardData']['summary']['Sales']])
+          @include('dashboard.salesCard', ['data' => $dashboardData['dashboardData']['summary']['Sales'] ?? null])
 
-          @include('dashboard.revenueCard', ['data' => $dashboardData['dashboardData']['summary']['Revenue']])
+          @include('dashboard.revenueCard', ['data' => $dashboardData['dashboardData']['summary']['Revenue'] ?? null])
 
-          @include('dashboard.customersCard', ['data' => $dashboardData['dashboardData']['summary']['Customers']])
+          @include('dashboard.customersCard', ['data' => $dashboardData['dashboardData']['summary']['Customers'] ?? null])
 
-          @include('dashboard.reports', ['data' => $dashboardData['dashboardData']['reports']])
+          @include('dashboard.reports', ['data' => $dashboardData['dashboardData']['reports'] ?? null])
 
-          @include('dashboard.recentSales', ['data' => $dashboardData['dashboardData']['recentSales']])
+          @include('dashboard.recentSales', ['data' => $dashboardData['dashboardData']['recentSales'] ?? null])
 
           <!-- Top Selling -->
           <div class="col-12">

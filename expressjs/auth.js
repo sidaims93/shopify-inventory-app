@@ -1,14 +1,17 @@
 
 const jwt = require('jsonwebtoken');
 
-module.exports = function(app, passport, mysqlAPI, traits, redis) {
+
+module.exports = function(app, passport, mysqlAPI, traits) {
 
     var authController = require('./controllers/authController');
-    var dashboardController = require('./controllers/dashboardController')(mysqlAPI, traits, redis);
-    var storeController = require('./controllers/storeController')(mysqlAPI, traits, redis);
-    var productsController = require('./controllers/productsController')(mysqlAPI, traits, redis);
-    var ordersController = require('./controllers/ordersController')(mysqlAPI, traits, redis);
-
+    var dashboardController = require('./controllers/dashboardController')(mysqlAPI, traits);
+    var storeController = require('./controllers/storeController')(mysqlAPI, traits);
+    var productsController = require('./controllers/productsController')(mysqlAPI, traits);
+    var ordersController = require('./controllers/ordersController')(mysqlAPI, traits);
+    var installationController = require('./controllers/installationController')(mysqlAPI, traits);
+    var stripeController = require('./controllers/stripeController')(mysqlAPI, traits);
+    
     function apiAuth(req, res, next) {
         if (req.headers['authorization']) {
             try {
@@ -30,6 +33,15 @@ module.exports = function(app, passport, mysqlAPI, traits, redis) {
             "message":"Invalid request header or token"
         });
     }
+
+    //Shopify installation or redirection routes
+    app.get('/shopify/auth', installationController.index);
+    app.get('/shopify/auth/redirect', installationController.redirect);
+
+    app.get('/stripe/test', stripeController.testScheduling);
+
+    app.get('/dashboard', dashboardController.index);
+
     const apiRoutePrefix = '/api/'; // This is so if we do versioning like /api/v1 or /api/v2 
     
     //Sync data APIs
@@ -45,6 +57,7 @@ module.exports = function(app, passport, mysqlAPI, traits, redis) {
 
     //AJAX APIs
     const ajaxPrefix = apiRoutePrefix + 'ajax/';
+    app.get(apiRoutePrefix+'returnableItems', apiAuth, dashboardController.getReturnObject);
     app.post(ajaxPrefix+'orders', apiAuth, ordersController.listOrders);
     app.post(ajaxPrefix+'products', apiAuth, productsController.listProducts);
     app.post(ajaxPrefix+'product/collections', apiAuth, productsController.listProductCollections);

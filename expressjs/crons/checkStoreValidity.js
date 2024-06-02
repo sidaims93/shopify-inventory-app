@@ -1,8 +1,8 @@
 class storeValidityHandler {
     
-    constructor(mysqlAPI, redis, traits) {
+    constructor(mysqlAPI, traits) {
         this.mysqlAPI = mysqlAPI;
-        this.redis = redis;
+        //this.redis = redis;
         this.traits = traits;
 
         this.FunctionTrait = traits.FunctionTrait;
@@ -16,7 +16,7 @@ class storeValidityHandler {
                 for await (var store of stores) {
                     var redisKey = 'Store:Validation:Result:'+store.id;
                     var result = await this.checkValidityForStore(store);
-                    await this.redis.set(redisKey, result, 'EX', parseInt(5*60));
+                    //await this.redis.set(redisKey, result, 'EX', parseInt(5*60));
                 }
             }
         } catch (error) {

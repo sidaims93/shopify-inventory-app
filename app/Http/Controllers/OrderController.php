@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Traits\FunctionTrait;
 use App\Traits\RequestTrait;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -38,5 +39,17 @@ class OrderController extends Controller {
                 "endpoint" => $endpoint
             ]
         ], 200);
+    }
+
+    public function getReturnableLineItemsForOrder($orderId) {
+        try{
+            $user = Auth::user();
+            $endpoint = getDockerAPIURL('returnableItems?order_id='.$orderId);
+            $headers = getDockerAPIHeaders($user->authtoken);
+            $response = $this->makeADockerAPICall('GET', $endpoint, $headers);
+            dd($response);
+        } catch(Exception $e) {
+            return response()->json(['status' => true, 'message' => $e->getMessage().' '.$e->getLine()]);
+        }
     }
 }

@@ -112,8 +112,8 @@ class InstallationController extends Controller {
 
                             //Save the shop to the db and map it to a user. Use a pivot table for it.
                             $storeDetails = $this->saveStoreDetailsToDatabase($shopDetails['shop'], $accessTokenResp['accessToken']);
-                            Log::info('StoreDetails here');
-                            Log::info($storeDetails);
+                            // Log::info('StoreDetails here');
+                            // Log::info($storeDetails);
                             if(array_key_exists('status', $storeDetails) && $storeDetails['status']) {  
                                 //At this point the installation process is complete.
                                 if(Auth::check()) {
@@ -129,7 +129,7 @@ class InstallationController extends Controller {
                 } else throw new Exception('Code / Shop param not present in the URL');                        
             } else throw new Exception('Invalid Request', 401);
         } catch(Exception $e) {
-            return response()->json(['status' => false, 'message' => $e->getMessage()], $e->getCode());
+            return response()->json(['status' => false, 'message' => $e->getMessage()]);
         }
     }
 

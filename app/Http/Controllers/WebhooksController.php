@@ -50,11 +50,8 @@ class WebhooksController extends Controller {
         $request = $request->all();
         $validRequest = $this->checkValidRequestFromShopify($request);
         if($validRequest) {
-            $response = [
-                'status' => true,
-                'message' => 'Not Found',
-                'code' => 404,
-            ];
+            //Process the webhook here
+            ProcessWebhook::dispatch($request);
         } else {
             $response = [
                 'status' => false,

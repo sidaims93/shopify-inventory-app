@@ -18,9 +18,9 @@ trait RequestTrait {
             $client = new Client();
             $response = null;
             if($method == 'GET' || $method == 'DELETE') {
-                $response = $client->request($method, $endpoint, [ 'headers' => $headers ]);
+                $response = $client->request($method, $endpoint, [ 'headers' => $headers, 'verify' => false ]);
             } else {
-                $response = $client->request($method, $endpoint, [ 'headers' => $headers, 'json' => $requestBody ]);
+                $response = $client->request($method, $endpoint, [ 'headers' => $headers, 'json' => $requestBody, 'verify' => false ]);
             } 
             return [
                 'statusCode' => $response->getStatusCode(),

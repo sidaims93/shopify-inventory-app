@@ -43,14 +43,14 @@ trait FunctionTrait {
      * @param string $password - Used to make login api request
      */
     public function saveAuthTokenForUser($user, $password) {
-        $endpoint = getDockerAPIURL('api/login');
+        $endpoint = getDockerAPIURL('login');
         $headers = getDockerAPIHeaders();
         $payload = [
             'email' => $user->email,
             'password' => $password
         ];
 
-        $this->makeADockerAPICall('POST', $endpoint, $headers, $payload);
+        return $this->makeADockerAPICall('POST', $endpoint, $headers, $payload);
     }
 
     /**

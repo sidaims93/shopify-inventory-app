@@ -19,6 +19,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('orders')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('shopify.orders');
         Route::get('sync', [OrderController::class, 'syncOrdersForStore'])->name('shopify.orders.sync');
+        Route::get('getReturnableItems/{orderId}', [OrderController::class, 'getReturnableLineItemsForOrder'])->name('shopify.orders.getReturnableLineItems');
     });
 
     Route::prefix('products')->group(function () {
@@ -64,12 +65,6 @@ Route::prefix('gdpr/webhooks')->group(function () {
     Route::any('customer_data_erasure', [WebhooksController::class, 'handleCustomerDataErasure']);
     Route::any('shop_data_erasure', [WebhooksController::class, 'handleShopDataErasure']);
 });
-
-
-
-
-
-
 
 
 

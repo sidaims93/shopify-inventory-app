@@ -1,5 +1,5 @@
 
-module.exports = (Sequelize, DataTypes, mongoDbClient) => {
+module.exports = (Sequelize, DataTypes) => {
     var env = process.env.NODE_ENV;
     var config = require('../config.json')[env];
     var sequelize = new Sequelize(config.database, config.username, config.password, config);
@@ -103,6 +103,26 @@ module.exports = (Sequelize, DataTypes, mongoDbClient) => {
             })
         },
 
+        getStoreByDomain: async function (shop) {
+            return await ShopifyStores.findOne({where: {myshopify_domain: shop}});
+        },
+
+        updateOrCreateUserRecord: async function (userBody) {
+            return await this.updateOrCreateOnModel(Users, {"email": userBody.email}, userBody);
+        },
+
+        updateOrCreateStoreRecord: async function (storeBody) {
+            return await this.updateOrCreateOnModel(ShopifyStores, {"myshopify_domain": storeBody.myshopify_domain}, storeBody);
+        },
+
+        updateOrCreateUserStoreMapping: async function (userRecord, storeRecord) {
+            var obj = {
+                "user_id": userRecord.id,
+                "store_id": storeRecord.table_id
+            };
+            return await this.updateOrCreateOnModel(UserStores, obj, obj);
+        },
+
         updateOrCreateShopifyProductCollection: async function (collection) {
             return this.updateOrCreateOnModel(ProductCollections, {'id': collection.id, 'store_id': collection.store_id}, collection);
         },
@@ -116,19 +136,24 @@ module.exports = (Sequelize, DataTypes, mongoDbClient) => {
         },
         
         updateOrCreateShopifyLocation: async function (location) {
-            return this.updateOrCreateOnModel(StoreLocations, {'id': location.id, 'store_id': location.store_id}, location)
+            return await this.updateOrCreateOnModel(StoreLocations, {'id': location.id, 'store_id': location.store_id}, location)
         },
 
         updateOrCreateOnModel: async function (Model, where, newItem) {
             // First try to find the record
-            return Model.findOne({where: where})
+            const dbOperation = await Model.findOne({where: where, raw: true})
             .then(function (foundItem) {
                 if (!foundItem) {
-                    return Model.create(newItem).then(function (item) { return  {item: item, created: true}; })
+                    return Model.create(newItem).then(function (item) { return { item: item, created: true }; })
                 }
                  // Found an item, update it
-                return Model.update(newItem, {where: where}).then(function (item) { return {item: item, created: false} }) ;
-            })
+                return Model.update(newItem, {where: where} ).then(function (item) { console.log(item); return {item: item, created: false} }) ;
+            });
+
+            console.log('dbOperation');
+            console.log(dbOperation);
+
+            return Model.findOne({where: where, raw: true});
         },
 
         getStoreProducts: async function (store_id, filterArr) {

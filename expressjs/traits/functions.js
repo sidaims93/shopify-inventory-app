@@ -1,16 +1,41 @@
 const { Sequelize, Model, DataTypes, DATE } = require('sequelize');
 const mysqlAPI = require('../src/mysql-api')(Sequelize, DataTypes);
+var crypto = require('crypto');
 const nodeCache = require('node-cache');
 const cacheInstance = new nodeCache();
 module.exports = {
-    
+    getStoreByDomain: async function (shop) {
+        return await mysqlAPI.getStoreByDomain(shop);
+    },
+
+    isRequestFromShopify: async function (req, clientSecret) {
+        var hmac = req.hmac;
+        delete(req.hmac);
+        var data = new Array();
+        for (var key in req){
+            key = key.replace("%", "%25");
+            key = key.replace("&", "%26");
+            key = key.replace("=", "%3D");
+            
+            var val = req[key];
+            val = val.replace("%","%25");
+            val = val.replace("&","%26");
+            data.push(key+'='+val);
+        }
+        data = data.join('&');
+        const genHash = crypto.createHmac("sha256", clientSecret).update(data).digest("hex");
+        return genHash === hmac;
+    },
+
     /**
      * @param {string} path 
      * @param {object} store
      * @returns {string} URL - Format the same as Shopify API URLs
      */
     getShopifyAPIURLForStore(path, store) {
-        const API_VERSION = process.env.SHOPIFY_API_VERSION;
+        var API_VERSION = process.env.SHOPIFY_API_VERSION;
+        if(API_VERSION.length < 1) 
+            API_VERSION = '2024-01';
         return `https://${store.myshopify_domain}/admin/api/${API_VERSION}/${path}`;
     },
 
