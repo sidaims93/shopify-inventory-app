@@ -84,6 +84,7 @@ module.exports = (mysqlAPI, traits) => {
                   var sinceIdPrefix = since_id !== null ? '?since_id='+since_id : '';
                   var endpoint = functionTrait.getShopifyAPIURLForStore(`products.json`+sinceIdPrefix, store);
                   var response = await requestTrait.makeAnAPICallToShopify('GET', endpoint, headers);
+                  console.log(response);
                   if(response.status) {
                     products = response.respBody.products;
                     if(products !== null && products.length > 0) {

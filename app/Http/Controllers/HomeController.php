@@ -39,7 +39,7 @@ class HomeController extends Controller {
         $endpoint = getDockerAPIURL('dashboard');
         $headers = getDockerAPIHeaders($user->authtoken);
         $response = $this->makeADockerAPICall('GET', $endpoint, $headers);
-        //dd($response);
+        //dd($response); 
         return $response['body'];
     }
 

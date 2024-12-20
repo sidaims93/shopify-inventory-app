@@ -19,20 +19,22 @@ trait FunctionTrait {
 
     /**
      * Pretty important function if you want to maintain 1:1 mirror from Shopify
+     * 
+     * Now, this has been modified to match attributes with GraphQL 
+     * 
      * @param array an object we send that we get from Shopify API call.
      * @param array that exists under config table_indexes.php file.
      */
-    public function getTablePayloadForUpdateOrCreate($arr, $config_index) {
-        $returnVal = [];
+    public function getTablePayloadForUpdateOrCreate($arr) {
+        Log::info('In update or create function');
+        Log::info($arr);
+        $returnVal = [
+            'id' => str_replace('gid://shopify/Shop/', '', $arr['id']),
+            'myshopify_domain' => $arr['myshopifyDomain'],
+            'name' => $arr['name'],
+            'email' => $arr['email']
+        ];
 
-        $config_arr = config('table_indexes.'.$config_index);
-        foreach($config_arr as $index => $dataType) {
-            if(array_key_exists($index, $arr)) {
-                $temp = $arr[$index];
-                settype($temp, $dataType);
-                $returnVal[$index] = $temp;
-            }
-        }
         return $returnVal;
     }
 

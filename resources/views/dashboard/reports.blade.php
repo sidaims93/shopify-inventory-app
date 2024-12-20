@@ -1,3 +1,4 @@
+@if($data != null)
 <!-- Reports -->
 <div class="col-12">
     <div class="card">
@@ -87,3 +88,4 @@
     </div>
 </div>
 <!-- End Reports -->
+@endif

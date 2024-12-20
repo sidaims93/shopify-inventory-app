@@ -1,3 +1,4 @@
+@if($data != null)
 <!-- Customers Card -->
 <div class="col-xxl-4 col-xl-12">
 
@@ -35,3 +36,4 @@
 </div>
 
 </div><!-- End Customers Card -->
+@endif

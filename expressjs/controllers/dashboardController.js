@@ -2,7 +2,7 @@ const lineItemId = "gid://shopify/AppSubscriptionLineItem/31562236177?v=1&index=
 const nodeCache = require('node-cache');
 const myCache = new nodeCache();
 
-module.exports = (mysqlAPI, traits) => {
+module.exports = (mysqlAPI, traits, redis) => {
   const functionTrait = traits.FunctionTrait;
   const requestTrait = traits.RequestTrait;
 
@@ -45,21 +45,17 @@ module.exports = (mysqlAPI, traits) => {
     
     index: async function (req, res) {
       try {
-        console.log('In dashboard api');
-        return res.json({'status': true, 'message': 'In dashboard'});
-        /*
+        
         var authUser = req.user;
         var storeData = await mysqlAPI.getShopifyStoreData(authUser);
         var storesAvailable = await mysqlAPI.getAllShopifyStoresAssociatedWithUser(authUser);
         
         var returnVal;
-        */
-
+        
         /**check if cache already has the value */
-        /*
         var cacheKey = `dashboard:${authUser.id}`;
-        var cacheHasData = false;
-        //var cacheHasData = await redis.exists(cacheKey);
+        //var cacheHasData = false;
+        var cacheHasData = await redis.exists(cacheKey);
         //var cacheHasData = myCache.has(cacheKey);
 
         if(cacheHasData) {
@@ -70,7 +66,7 @@ module.exports = (mysqlAPI, traits) => {
           returnVal = null;
         } else {
           var dashboardData = {
-            "summary": await functionTrait.getDashboardSummary(authUser, storeData),
+            "summary": await functionTrait.getDashboardSummary(authUser, storeData, redis),
             "recentActivity": await functionTrait.getRecentActivity(authUser, storeData),
             "reports": await functionTrait.getReportData(authUser, storeData),
             "budgetReport": await functionTrait.getBudgetReport(authUser, storeData),
@@ -91,12 +87,12 @@ module.exports = (mysqlAPI, traits) => {
           // console.log('setting in cache');
           // myCache.set(cacheKey, JSON.stringify(returnVal), 120);
           
-          //console.log('setting in redis');
-          //await redis.set(cacheKey, JSON.stringify(returnVal), 'EX', 120);
+          console.log('setting in redis');
+          await redis.set(cacheKey, JSON.stringify(returnVal), 'EX', 120);
         }
-        return res.json(returnVal)
-        */  
+        return res.json(returnVal)  
       } catch (error) {
+        console.trace(error);
         return res.json({
           "status": false,
           "message": "Something went wrong. If the issue persists, please contact Customer support.",

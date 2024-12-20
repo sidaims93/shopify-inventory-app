@@ -37,6 +37,29 @@ trait RequestTrait {
         }
     }
 
+    public function makeAGraphQLAPIToShopify($store, $payload) {
+        try {
+            $client = new Client();
+            $endpoint = getShopifyAPIURLForStore('graphql.json', $store);
+            $headers = getShopifyAPIHeadersForStore($store);
+            $response = $client->request('POST', $endpoint, [ 'headers' => $headers, 'json' => $payload, 'verify' => false ]);
+
+            return [
+                'statusCode' => $response->getStatusCode(),
+                'body' => json_decode($response->getBody(), true)
+            ];
+        } catch (Exception $e) {
+            Log::info('Error calling in RequestTrait GraphQL function');
+            Log::info($e->getMessage().' '.$e->getLine());
+            return [
+                'statusCode' => $e->getCode(),
+                'message' => $e->getMessage(),
+                'body' => null
+            ];
+        }
+        
+    }
+
     public function makeADockerAPICall($method, $endpoint, $headers, $payload = null) {
         try {
             $client = new Client();

@@ -46,6 +46,17 @@ class ProductController extends Controller {
         dd($response);
     }
 
+    public function syncProductsForStore(Request $request) {
+        $user = Auth::user();
+        $endpoint = getDockerAPIURL('sync/products');
+        $headers = getDockerAPIHeaders($user->authtoken);
+        $response = $this->makeADockerAPICall('GET', $endpoint, $headers);
+
+        dd($response);
+
+        
+    }
+
     private function filterProductCollections($request, $user) {
         $endpoint = getDockerAPIURL('ajax/product/collections');
         $headers = getDockerAPIHeaders($user->authtoken);

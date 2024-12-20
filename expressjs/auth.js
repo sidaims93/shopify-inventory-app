@@ -2,15 +2,15 @@
 const jwt = require('jsonwebtoken');
 
 
-module.exports = function(app, passport, mysqlAPI, traits) {
+module.exports = function(app, passport, mysqlAPI, traits, redis) {
 
     var authController = require('./controllers/authController');
-    var dashboardController = require('./controllers/dashboardController')(mysqlAPI, traits);
-    var storeController = require('./controllers/storeController')(mysqlAPI, traits);
-    var productsController = require('./controllers/productsController')(mysqlAPI, traits);
-    var ordersController = require('./controllers/ordersController')(mysqlAPI, traits);
-    var installationController = require('./controllers/installationController')(mysqlAPI, traits);
-    var stripeController = require('./controllers/stripeController')(mysqlAPI, traits);
+    var dashboardController = require('./controllers/dashboardController')(mysqlAPI, traits, redis);
+    var storeController = require('./controllers/storeController')(mysqlAPI, traits, redis);
+    var productsController = require('./controllers/productsController')(mysqlAPI, traits, redis);
+    var ordersController = require('./controllers/ordersController')(mysqlAPI, traits, redis);
+    var installationController = require('./controllers/installationController')(mysqlAPI, traits, redis);
+    var stripeController = require('./controllers/stripeController')(mysqlAPI, traits, redis);
     
     function apiAuth(req, res, next) {
         if (req.headers['authorization']) {

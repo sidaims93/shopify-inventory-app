@@ -1,4 +1,5 @@
 <!-- Sales Card -->
+@if($data != null)
 <div class="col-xxl-4 col-md-6">
     <div class="card info-card sales-card">
 
@@ -29,3 +30,4 @@
 
     </div>
 </div><!-- End Sales Card -->
+@endif

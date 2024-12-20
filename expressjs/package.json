@@ -25,6 +25,7 @@
     "mysql2": "^3.6.2",
     "node-cache": "^5.1.2",
     "node-cron": "^3.0.3",
+    "nodemon": "^3.1.4",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",

@@ -3,10 +3,10 @@ const app = express()
 const port = 3000;
 const bodyParser = require('body-parser'); // middleware
 app.use(bodyParser.urlencoded({ extended: true }));
-//const Redis = require("ioredis");
-//const { MongoClient } = require('mongodb');
+const Redis = require("ioredis");
+// const { MongoClient } = require('mongodb');
 //var cronHandler = require('node-cron');
-/*
+
 const redis = new Redis({
   port: 6379, // Redis port
   host: "127.0.0.1" // Redis host
@@ -18,7 +18,6 @@ try {
 } catch (error) {
   console.log('Error with redis '+error.message);
 }
-*/
 
 // Connection URL
 // const url = 'mongodb://0.0.0.0:27017/';
@@ -72,7 +71,7 @@ const traits = {FunctionTrait, RequestTrait}
 
 //load passport strategies 
 require('./passport/passport.js')(passport, models.user);
-require('./auth.js')(app, passport, mysqlAPI, traits);
+require('./auth.js')(app, passport, mysqlAPI, traits, redis);
 
 app.get('/', (req, res) => {
   res.json({

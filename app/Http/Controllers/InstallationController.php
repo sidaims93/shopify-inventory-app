@@ -47,13 +47,13 @@ class InstallationController extends Controller {
                     $shopDetails = $this->getShopifyStoreByDomain($shop);
                     if($shopDetails !== null && isset($shopDetails->accessToken) && $this->checkIfStoreAccessTokenIsValid($shopDetails)) {
                         if(Auth::check()) {
-                            return redirect()->route('dashboard');
+                            return redirect()->route('home');
                         } else {
                             $userStore = UserStores::where('store_id', $shopDetails->table_id)->latest();
                             if($userStore !== null && $userStore->count() > 0) {
                                 $user = User::where('id', $userStore->user_id)->first();    
                                 Auth::login($user);
-                                return redirect()->route('dashboard')->with('success', 'Welcome back!');
+                                return redirect()->route('home')->with('success', 'Welcome back!');
                             } 
                         }
                     }
@@ -67,7 +67,7 @@ class InstallationController extends Controller {
             }
             throw new Exception('Invalid Request', 401);
         } catch(Exception $e) {
-            return response()->json(['status' => false, 'message' => $e->getMessage()]);
+            return response()->json(['status' => false, 'message' => $e->getMessage().' '.$e->getLine()]);
         }
     }
 
@@ -76,14 +76,33 @@ class InstallationController extends Controller {
      * Which means take the access token, making an API call to Shop.json and 
      * check if 200 status was returned.
      * 
+     * Previously this was a REST API now its a GraphQL one
+     * 
      * @param object|null store object record (might be null)
      * @return bool the result whether the accessToken is valid for making authenticated API calls.
      */
-    public function checkIfStoreAccessTokenIsValid($storeDetails) {
-        $endpoint = getShopifyAPIURLForStore('shop.json', $storeDetails);
-        $headers = getShopifyAPIHeadersForStore($storeDetails);
-        $response = $this->makeAnAPICallToShopify('GET', $endpoint, $headers);
-        return $response['statusCode'] == 200;
+    public function checkIfStoreAccessTokenIsValid($store) {
+        // $endpoint = getShopifyAPIURLForStore('shop.json', $storeDetails);
+        // $headers = getShopifyAPIHeadersForStore($storeDetails);
+        // $response = $this->makeAnAPICallToShopify('GET', $endpoint, $headers);
+        //return $response['statusCode'] == 200;
+
+        $payload = [
+            'query' => '{ 
+                shop {
+                    name
+                    email
+                    myshopifyDomain
+                    id
+                }
+            }'
+        ];
+
+        $response = $this->makeAGraphQLAPIToShopify($store, $payload);
+        Log::info('Response for checking validity');
+        Log::info($response);
+
+        return $response['statusCode'] == 200 && isset($response['body']['shop']['id']);
     }
     
     /**
@@ -103,6 +122,8 @@ class InstallationController extends Controller {
                     $code = $request->code;
 
                     //We call the 'admin/oauth/access_token endpoint so we can make authenticated API calls
+                    //This request access token is still valid because this is not an authenticated REST API
+                    //So we are still fine to use this
                     $accessTokenResp = $this->requestAccessTokenFromShopifyForThisStore($shop, $code);
                     if($accessTokenResp['status'] !== false && $accessTokenResp['accessToken'] !== null) {
                         
@@ -111,13 +132,15 @@ class InstallationController extends Controller {
                         if(array_key_exists('status', $shopDetails) && $shopDetails['status'] == true) {
 
                             //Save the shop to the db and map it to a user. Use a pivot table for it.
-                            $storeDetails = $this->saveStoreDetailsToDatabase($shopDetails['shop'], $accessTokenResp['accessToken']);
+                            Log::info('Before');
+                            Log::info($shopDetails);
+                            $storeDetails = $this->saveStoreDetailsToDatabase($shopDetails['data'], $accessTokenResp['accessToken']);
                             // Log::info('StoreDetails here');
                             // Log::info($storeDetails);
                             if(array_key_exists('status', $storeDetails) && $storeDetails['status']) {  
                                 //At this point the installation process is complete.
                                 if(Auth::check()) {
-                                    return redirect()->route('dashboard')->with('success', "Installation completed and store attached to your account.");
+                                    return redirect()->route('home')->with('success', "Installation completed and store attached to your account.");
                                 } else {
                                     //$user = User::where('id', $storeDetails['userInfo']->user_id)->first();    
                                     //Auth::login($user);
@@ -178,20 +201,45 @@ class InstallationController extends Controller {
      * @param string shop - something like 'shop.myshopify/com'
      * @param string accessToken - obtained from Shopify OAuth flow
      * 
+     * Previously this was REST API now this has been converted to GraphQL API.
+     * 
      * @return array [status => bool, data/shop]
      */
 
     private function getShopDetailsFromShopify($shop, $accessToken) {
         try {   
-            $endpoint = getShopifyAPIURLForStore('shop.json', ['myshopify_domain' => $shop]);
-            $headers = getShopifyAPIHeadersForStore(['accessToken' => $accessToken]);
-            $response = $this->makeAnAPICallToShopify('GET', $endpoint, $headers);
+            // $endpoint = getShopifyAPIURLForStore('shop.json', ['myshopify_domain' => $shop]);
+            // $headers = getShopifyAPIHeadersForStore(['accessToken' => $accessToken]);
+            // $response = $this->makeAnAPICallToShopify('GET', $endpoint, $headers);
 
-            if(array_key_exists('statusCode', $response) && $response['statusCode'] == 200) {
-                return ['status' => true, 'shop' => $response['body']['shop']];
-            } else {
-                return ['status' => false, 'data' => $response];
-            }
+            // if(array_key_exists('statusCode', $response) && $response['statusCode'] == 200) {
+            //     return ['status' => true, 'shop' => $response['body']['shop']];
+            // } else {
+            //     return ['status' => false, 'data' => $response];
+            // }
+
+            $storeObj = [
+                'myshopify_domain' => $shop,
+                'accessToken' => $accessToken
+            ];
+
+            $payload = [
+                'query' => '{ 
+                    shop {
+                        id
+                        email
+                        myshopifyDomain
+                        name
+                    }
+                }'
+            ];
+
+            $response = $this->makeAGraphQLAPIToShopify($storeObj, $payload);
+
+            return [
+                'status' => $response['statusCode'] == 200,
+                'data' => isset($response['body']['data']['shop']) ? $response['body']['data']['shop'] : $response
+            ];
         } catch(Exception $e) {
             Log::info('Error getting shop details '.$e->getMessage().' '.$e->getLine());
             return ['status' => false, 'data' => $e->getMessage().' '.$e->getLine()];
@@ -199,19 +247,21 @@ class InstallationController extends Controller {
     }
 
     /**
-     * @param array shopDetails - Obtained from shop.json API call. Contains data inside of 'shop' key.
+     * @param array shopDetails - Obtained from GraphQL API call. Contains data inside of 'shop' key.
      * @param string accessToken - Obtained from the function requestAccessTokenFromShopifyForThisStore above
+     * 
+     * This has to be modified because the attributes returned don't match the REST API attributes
      * 
      * @return array ['status' => bool, 'additional info' => object]
      */
     private function saveStoreDetailsToDatabase($shopDetails, $accessToken) {
         try {
-            $payload = $this->getTablePayloadForUpdateOrCreate($shopDetails, 'shopify_stores');
+            $payload = $this->getTablePayloadForUpdateOrCreate($shopDetails);
             $payload = array_merge(['accessToken' => $accessToken], $payload);
             //Log::info('Store Payload got');
             //Log::info($payload);
 
-            $updateArr = ['myshopify_domain' => $shopDetails['myshopify_domain']];
+            $updateArr = ['myshopify_domain' => $shopDetails['myshopifyDomain']];
             $store = ShopifyStore::updateOrCreate($updateArr, $payload);
             $password = Hash::make('123456');
             //Lets create a user for this. If they are already logged in then pick them as the new mapped user.
